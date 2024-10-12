@@ -64,7 +64,7 @@ class TaskManager {
     }
 
     const taskPriority = document.createElement('img');
-    taskPriority.src = `/assets/img/icons/priority/${getPriorityIconFromNumber(task.priority)}.svg`;
+    taskPriority.src = `assets/img/icons/priority/${getPriorityIconFromNumber(task.priority)}.svg`;
     taskPriority.classList.add('priority-icon');
     taskNode.appendChild(taskPriority);
 
