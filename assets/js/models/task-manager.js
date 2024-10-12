@@ -29,7 +29,7 @@ class TaskManager {
       id: self.crypto.randomUUID(), 
       name: task.name,
       priority: parseInt(task.priority),
-      done: task.done
+      isCompleted: false
     });
   }
 
@@ -37,6 +37,12 @@ class TaskManager {
     this.tasks = this.tasks.filter((task) => task.id !== id);
   }
 
+  complete(id) {
+    const task = this.tasks.find((task) => task.id === id);
+    if(task) {
+      task.isCompleted = true;
+    }  
+  }
 
   buildTaskHTML(task) {
     const taskNode = document.createElement('li');
@@ -58,22 +64,19 @@ class TaskManager {
     taskNode.appendChild(taskActionsNode);
 
     const doneTaskNode = document.createElement('i');
-    doneTaskNode.classList.add('fa', 'fa-solid', 'fa-check', 'text-secondary');
+    doneTaskNode.classList.add('fa', 'fa-check');
     doneTaskNode.setAttribute('role', 'button');
     taskActionsNode.appendChild(doneTaskNode);
 
-    doneTaskNode.addEventListener('click', () =>
-      {
-        task.done = true;
+    doneTaskNode.addEventListener('click', () => {
+        this.complete(task.id);
         this.render();
       });
 
-    if(task.done) {
+    if(task.isCompleted) {
       taskNameNode.classList.add('text-decoration-line-through');
       taskNode.classList.add('bg-light');
       doneTaskNode.classList.add('text-success');
-      doneTaskNode.classList.remove('text-secondary');
-
     } else {
       const deleteTaskNode = document.createElement('i');
       deleteTaskNode.classList.add('fa', 'fa-trash-o', 'text-danger');
