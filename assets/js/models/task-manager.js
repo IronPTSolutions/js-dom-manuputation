@@ -21,7 +21,7 @@ class TaskManager {
 
     const form = event.target;
     const task = Object.fromEntries(new FormData(form).entries());
-    if (task.name.trim() !== '') {
+    if (task.name.trim() !== '' && task.date) {
       this.add(task);
       form.reset();
       this.render();
