@@ -1,0 +1,17 @@
+#create-task-form [name="priority"] {
+  max-width: 110px;
+}
+
+#create-task-form [name="date"] {
+  max-width: 150px;
+}
+
+
+.priority-icon{
+  width: 16px;
+  height: auto; 
+}
+
+.fa-check:hover{
+  color:green;
+}

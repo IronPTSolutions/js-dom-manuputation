@@ -16,37 +16,62 @@
     crossorigin="anonymous" 
     referrerpolicy="no-referrer" 
     />
+
+  <link rel="stylesheet" href="styles/style.css"/>
+
 </head>
 <body>
-
   <div class="container py-5">
-    <h2 class="fw-light mb-3">Task Manager</h2>
+    <div class="d-flex align-items-baseline">
+      <h2 class="fw-light mb-3 me-auto">Task Manager</h2>
+
+      <div id="task-filter" class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-outline-light text-black">All</button>
+        <button type="button" class="btn btn-outline-light">
+          <img class="priority-icon" src="assets/img/icons/priority/critical.svg"></img>
+        </button>
+        <button type="button" class="btn btn-outline-light">
+          <img class="priority-icon" src="assets/img/icons/priority/high.svg"></img>
+        </button>
+        <button type="radio" class="btn btn-outline-light">
+          <img class="priority-icon" src="assets/img/icons/priority/medium.svg"></img>
+        </button>
+        <button type="button" class="btn btn-outline-light">
+          <img class="priority-icon" src="assets/img/icons/priority/low.svg"></img>
+        </button>
+        <button type="button" class="btn btn-outline-light">
+          <img class="priority-icon" src="assets/img/icons/priority/minor.svg"></img>
+        </button>
+      </div>
+    </div>
 
     <form id="create-task-form" action="/" method="post">
       <div class="input-group mb-3">
         <span class="input-group-text"><i class="fa fa-tag"></i></span>
+
+        <select name="priority" class="form-select" aria-label="Default select example">
+          <option value="1" selected>Critical</option>
+          <option value="2">High</option>
+          <option value="3">Medium</option>
+          <option value="4">Low</option>
+          <option value="5">Minor</option>
+        </select>
+
+        <input name="date" type="date" class="form-control task-date-picker">
         <input name="name" type="text" class="form-control" placeholder="Enter task name...">
         <button class="btn btn-outline-secondary" type="submit"><i class="fa fa-plus"></i></button>
       </div>
     </form>
 
     <ul id="tasks-container" class="list-group">
-      <li class="list-group-item d-flex gap-1 align-items-baseline">
-        <div class="me-auto">Task 1</div>
-        <div class="d-flex gap-2">
-          <i class="fa fa-trash-o text-danger" role="button"></i>
-          <i class="fa fa-edit text-success" role="button"></i>
-        </div>
-      </li>
-      <li class="list-group-item">A second item</li>
-      <li class="list-group-item">A third item</li>
-      <li class="list-group-item">A fourth item</li>
-      <li class="list-group-item">And a fifth one</li>
+      
     </ul>
   </div>
   
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  <script src="/assets/js/utils.js"></script>
   <script src="/assets/js/models/task-manager.js"></script>
   <script src="/assets/js/main.js"></script>
 </body>
