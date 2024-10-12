@@ -1,12 +1,18 @@
 class TaskManager {
 
-  constructor(containerId, createTaskFormId) {
+  constructor(containerId, createTaskFormId, taskFilterId) {
     this.containerId = containerId;
     this.createTaskFormId = createTaskFormId;
+    this.taskFilterId = taskFilterId;
+
+    this.filter = '0';
     this.tasks = [];
 
     document.getElementById(this.createTaskFormId)
       .addEventListener('submit', (event) => this.onTaskFormSubmit(event));
+
+    this.initTaskFilter(document.getElementById(this.taskFilterId));
+
   }
   
 
@@ -22,14 +28,24 @@ class TaskManager {
     }
   }
 
-  add(task) {
-    console.log(task);
+  initTaskFilter(taskFilter) {
+    const buttons = taskFilter.getElementsByTagName('button');
 
+    for(let i = 0; i< buttons.length;  i++) {
+      buttons[i].addEventListener('click', () => {
+        this.filter = i.toString();
+        this.render();
+      });
+    }
+  }
+
+  add(task) {
     this.tasks.push({ 
       id: self.crypto.randomUUID(), 
       name: task.name,
       priority: parseInt(task.priority),
-      isCompleted: false
+      isCompleted: false,
+      date: new Date(task.date).setHours(0, 0, 0, 0)
     });
   }
 
@@ -59,6 +75,7 @@ class TaskManager {
     taskNameNode.appendChild(document.createTextNode(task.name));
     taskNode.appendChild(taskNameNode);
 
+
     const taskActionsNode = document.createElement('div');
     taskActionsNode.classList.add('d-flex', 'gap-2');
     taskNode.appendChild(taskActionsNode);
@@ -87,6 +104,15 @@ class TaskManager {
         this.delete(task.id);
         this.render();  
       });
+
+      const todayDate = new Date().setHours(0, 0, 0, 0);
+
+      if(task.date < todayDate) {
+        taskNode.classList.add('bg-danger');
+      } else if(task.date === todayDate) {
+        taskNode.classList.add('bg-warning');
+      }
+
     }
 
     return taskNode;
@@ -96,8 +122,18 @@ class TaskManager {
     const container = document.getElementById(this.containerId);
     container.innerHTML = '';
 
-    for (let i = 0; i < this.tasks.length; i++) {
-      const task = this.tasks[i];
+    let filteredTasks = [];
+    
+    if(this.filter === '0') {
+      filteredTasks =  this.tasks;
+    } else {
+      filteredTasks = this.tasks.filter(task => task.priority == this.filter); 
+    }
+
+    filteredTasks = filteredTasks.sort((a, b) =>  a.date - b.date);
+
+    for (let i = 0; i < filteredTasks.length; i++) {
+      const task = filteredTasks[i];
       container.appendChild(this.buildTaskHTML(task));
     }
   }
