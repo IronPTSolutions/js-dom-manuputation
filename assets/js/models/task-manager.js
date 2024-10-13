@@ -1,5 +1,4 @@
 class TaskManager {
-
   constructor(containerId, createTaskFormId) {
     this.containerId = containerId;
     this.createTaskFormId = createTaskFormId;
@@ -7,6 +6,37 @@ class TaskManager {
 
     document.getElementById(this.createTaskFormId)
       .addEventListener('submit', (event) => this.onTaskFormSubmit(event));
+
+     //Filter Buttons:
+     const allButton = document.getElementById('all-btn');
+     allButton.addEventListener('click', () => {
+       this.render();
+     })
+     
+     const criticalButton = document.getElementById('critical-btn')
+     criticalButton.addEventListener('click', () => {
+       this.taskFilter(criticalButton.name);
+     })
+ 
+     const highButton = document.getElementById('high-btn');
+     highButton.addEventListener('click', () => {
+       this.taskFilter(highButton.name);
+     })
+ 
+     const mediumButton = document.getElementById('medium-btn');
+     mediumButton.addEventListener('click', () => {
+       this.taskFilter(mediumButton.name);
+     })
+ 
+     const lowButtton = document.getElementById('low-btn');
+     lowButtton.addEventListener('click', () => {
+       this.taskFilter(lowButtton.name);
+     })
+ 
+     const minorButton = document.getElementById('minor-btn');
+     minorButton.addEventListener('click', () => {
+       this.taskFilter(minorButton.name);
+     })
   }
 
   onTaskFormSubmit(event) {
@@ -14,9 +44,10 @@ class TaskManager {
 
     const form = event.target;
     const task = Object.fromEntries(new FormData(form).entries());
-    if (task.name.trim() !== '') {
+    if (task.name.trim() !== '' && task.date !== '') {
       this.add(task);
-      form.reset();
+      //Deletes the input text when pressing the button:
+      form.reset(); 
       this.render();
     }
   }
@@ -24,7 +55,10 @@ class TaskManager {
   add(task) {
     this.tasks.push({ 
       id: self.crypto.randomUUID(), 
-      name: task.name
+      name: task.name,
+      priority: +task.priority,
+      isCompleted: false,
+      date: task.date
     });
   }
 
@@ -32,39 +66,93 @@ class TaskManager {
     this.tasks = this.tasks.filter((task) => task.id !== id);
   }
 
+  complete(id) {
+    //Find the task and store it in the task varible
+    const task = this.tasks.find((task) => task.id === id);
+    if (task) {
+      task.isCompleted = true;
+    }
+  }
+
+  taskFilter(priority) {
+    const filteredTasks = this.tasks.filter((task) => getPriorityFromNumber(task.priority) === priority);
+    this.render(filteredTasks);
+  }
+
+  
+
   buildTaskHTML(task) {
     const taskNode = document.createElement('li');
     taskNode.setAttribute('id', task.id);
     taskNode.classList.add('list-group-item', 'd-flex', 'gap-1', 'align-items-baseline');
+    
+    const priorityTaskNode = document.createElement('img');
+    priorityTaskNode.classList.add('priority-icon');
+    priorityTaskNode.setAttribute('src', `assets/img/icons/priority/${getPriorityFromNumber(task.priority)}.svg`);
+    taskNode.appendChild(priorityTaskNode);
 
     const taskNameNode = document.createElement('div');
-    taskNameNode.classList.add('me-auto');
-    taskNameNode.appendChild(document.createTextNode(task.name));
+    taskNameNode.classList.add('me-auto', 'text-justify');
+    if (task.isCompleted) {
+      taskNameNode.classList.add('text-decoration-line-through');
+      taskNode.classList.add('bg-light');
+    }
+    taskNameNode.appendChild(document.createTextNode(`${task.name}  -  ${task.date}`));
     taskNode.appendChild(taskNameNode);
 
+    
+  
     const taskActionsNode = document.createElement('div');
     taskActionsNode.classList.add('d-flex', 'gap-2');
     taskNode.appendChild(taskActionsNode);
 
-    const deleteTaskNode = document.createElement('i');
-    deleteTaskNode.classList.add('fa', 'fa-trash-o', 'text-danger');
-    deleteTaskNode.setAttribute('role', 'button');
-    taskActionsNode.appendChild(deleteTaskNode);
+    const checkTaskNode = document.createElement('i');
+    checkTaskNode.classList.add('fa', 'fa-check', 'text-success');
+    checkTaskNode.setAttribute('role', 'button');
+    taskActionsNode.appendChild(checkTaskNode);
 
-    deleteTaskNode.addEventListener('click', () => {
-      this.delete(task.id);
+    checkTaskNode.addEventListener('click', () => {
+      this.complete(task.id);
       this.render();
-    });
+    }
+    )
 
+    //Task completed:
+    if (!task.isCompleted) {
+      const deleteTaskNode = document.createElement('i');
+      deleteTaskNode.classList.add('fa', 'fa-trash-o', 'text-danger');
+      deleteTaskNode.setAttribute('role', 'button');
+      taskActionsNode.appendChild(deleteTaskNode);
+
+      deleteTaskNode.addEventListener('click', () => {
+        this.delete(task.id);
+        this.render();
+      });
+    }
     return taskNode;
   }
 
-  render() {
+
+  render(filteredTasks) {
     const container = document.getElementById(this.containerId);
     container.innerHTML = '';
 
-    for (let i = 0; i < this.tasks.length; i++) {
-      const task = this.tasks[i];
+    const printTasks = (!filteredTasks) ? this.tasks : filteredTasks;
+
+    printTasks.sort(function (a, b) {
+      const aDate = new Date (a.date);
+      const bDate = new Date (b.date);
+      if (aDate > bDate) {
+        return 1;
+      } else if (aDate < bDate) {
+        return -1;
+      } else {
+        return 0;
+      }
+    })
+    
+    for (let i = 0; i < printTasks.length; i++) {
+      const task = printTasks[i];
       container.appendChild(this.buildTaskHTML(task));
     }
   }
