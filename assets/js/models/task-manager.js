@@ -44,7 +44,7 @@ class TaskManager {
 
     const form = event.target;
     const task = Object.fromEntries(new FormData(form).entries());
-    if (task.name.trim() !== '') {
+    if (task.name.trim() !== '' && task.date !== '') {
       this.add(task);
       //Deletes the input text when pressing the button:
       form.reset(); 
@@ -57,7 +57,8 @@ class TaskManager {
       id: self.crypto.randomUUID(), 
       name: task.name,
       priority: +task.priority,
-      isCompleted: false
+      isCompleted: false,
+      date: task.date
     });
   }
 
@@ -78,25 +79,29 @@ class TaskManager {
     this.render(filteredTasks);
   }
 
+  
+
   buildTaskHTML(task) {
     const taskNode = document.createElement('li');
     taskNode.setAttribute('id', task.id);
     taskNode.classList.add('list-group-item', 'd-flex', 'gap-1', 'align-items-baseline');
-
+    
     const priorityTaskNode = document.createElement('img');
     priorityTaskNode.classList.add('priority-icon');
-    priorityTaskNode.setAttribute('src', `/assets/img/icons/priority/${getPriorityFromNumber(task.priority)}.svg`);
+    priorityTaskNode.setAttribute('src', `assets/img/icons/priority/${getPriorityFromNumber(task.priority)}.svg`);
     taskNode.appendChild(priorityTaskNode);
 
     const taskNameNode = document.createElement('div');
-    taskNameNode.classList.add('me-auto');
+    taskNameNode.classList.add('me-auto', 'text-justify');
     if (task.isCompleted) {
       taskNameNode.classList.add('text-decoration-line-through');
       taskNode.classList.add('bg-light');
     }
-    taskNameNode.appendChild(document.createTextNode(task.name));
+    taskNameNode.appendChild(document.createTextNode(`${task.name}  -  ${task.date}`));
     taskNode.appendChild(taskNameNode);
 
+    
+  
     const taskActionsNode = document.createElement('div');
     taskActionsNode.classList.add('d-flex', 'gap-2');
     taskNode.appendChild(taskActionsNode);
@@ -127,11 +132,24 @@ class TaskManager {
     return taskNode;
   }
 
+
   render(filteredTasks) {
     const container = document.getElementById(this.containerId);
     container.innerHTML = '';
 
     const printTasks = (!filteredTasks) ? this.tasks : filteredTasks;
+
+    printTasks.sort(function (a, b) {
+      const aDate = new Date (a.date);
+      const bDate = new Date (b.date);
+      if (aDate > bDate) {
+        return 1;
+      } else if (aDate < bDate) {
+        return -1;
+      } else {
+        return 0;
+      }
+    })
     
     for (let i = 0; i < printTasks.length; i++) {
       const task = printTasks[i];
