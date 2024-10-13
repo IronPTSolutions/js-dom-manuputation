@@ -1,0 +1,7 @@
+#create-task-form [name = "priority"] {
+    max-width: 100px;
+}
+
+.priority-icon {
+    height: 15px;
+}
